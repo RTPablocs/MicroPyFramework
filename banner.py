@@ -1,5 +1,5 @@
 from pyfiglet import Figlet
 
-def BannerSpawn():
+def bannerSpawn():
     f = Figlet(font='slant')
-    return f.renderText('MicroPyWeb')
+    return f.renderText('MicroPyFW')
