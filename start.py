@@ -1,4 +1,4 @@
-from app import app
+from app.httpServer import app
 
 app = app()
 app.run()

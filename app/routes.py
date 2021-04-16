@@ -1,7 +1,7 @@
-from greet import Greet
+from app.greet import Greet
 
 routes = [
-    {'path': 'hello', 'action': Greet },
+    {'path': '/', 'action': Greet },
 
 ]
 

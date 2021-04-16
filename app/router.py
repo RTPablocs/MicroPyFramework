@@ -1,6 +1,6 @@
-from routes import routes
+from app.routes import routes
 
-class router:
+class routingService:
 
     def __init__(self):
         self.routes = routes
