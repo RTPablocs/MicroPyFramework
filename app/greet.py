@@ -1,2 +1,2 @@
-def Greet():
-    return 'Hi There!'
+def Greet(name='/'):
+    return 'Hi There! {name}'.format(name=name)
