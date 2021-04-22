@@ -1,10 +1,12 @@
 from pyfiglet import Figlet
 import urllib.parse as parser
 
-def bannerGenerator():
+
+def banner_generate():
     f = Figlet(font='slant')
     return f.renderText('MicroPyFW')
 
-def urlParse(url):
+
+def url_parse(url):
     result = parser.urlparse(url)
     return result.path
