@@ -1,8 +1,9 @@
 from app.greet import Greet
 
 routes = [
-    {'path': '/', 'action': Greet },
-
+    {'path': '/hello', 'action': Greet},
+    {'path': '/hello/{var}', 'action': Greet},
+    {'path': '/', 'action': Greet}
 ]
 
 
