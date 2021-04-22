@@ -13,11 +13,11 @@ class routingService:
 
                 evalPath = url.urlparse(p).path.split('/')
                 evalPath[-1] = '{var}'
-                cPath = '/'.join(evalPath)
+                convertedPath = '/'.join(evalPath)
                 
                 if cPath == r['path']: 
-                    dynamic = url.urlparse(p).path.split('/')[-1]
-                    return {'path': cPath, 'realPath': p, 'dynamic': True, 'dynamicArgument': dynamic}
+                    dynamicArgument = url.urlparse(p).path.split('/')[-1]
+                    return {'path': convertedPath, 'realPath': p, 'dynamic': True, 'dynamicArgument': dynamicArgument}
 
             elif r['path'] == p:
                 return  {'path': p, 'dynamic': False}
@@ -25,17 +25,18 @@ class routingService:
 
     def routerEval(self, route):
 
-        rDict = self.dynamicEval(route)
+        resultDict = self.dynamicEval(route)
+        
         
         for r in self.routes:
-            if r['path'] == rDict['path'] and rDict['dynamic'] == True  : 
-                actionResult = r['action'](rDict['dynamicArgument'])
-                return {'code': '200 OK', 'actionResult': actionResult}
+            if resultDict and resultDict['dynamic'] == True: 
+                actionResult = r['action'](resultDict['dynamicArgument'])
+                return {'code': '200 OK', 'actionResult': resultDict}
             
-            elif r['path'] == rDict['path'] and rDict['dynamic'] == False:
+            elif resultDict and resultDict['dynamic'] == False:
                 actionResult = r['action']()
                 return{'code': '200 OK', 'actionResult': actionResult}
 
-            elif rDict['path'] not in r['path'] : 
+            elif resultDict and resultDict['path'] not in r['path'] : 
                 return {'code': '404 ERROR', 'actionResult': 'Path Not found'}
             
