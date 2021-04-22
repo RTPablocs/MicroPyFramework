@@ -1,8 +1,8 @@
 from wsgiref.simple_server import make_server
 from wsgiref.util import setup_testing_defaults, request_uri
 from app.router import routingService
-from app.parseURL import urlParse
-from extensions.banner import bannerSpawn
+from extensions.utils import urlParse
+from extensions.utils import bannerSpawn
 import os
 
 class app:
@@ -17,6 +17,9 @@ class app:
     def baseServe(self, environ, start_response):
         path = urlParse(str(request_uri(environ)))
         result = self.router.routerEval(path)
+        print('A')
+        print(type(result))
+        print('B')
         status = result['code']
         headers = [('Content-Type', 'application/json; charset=utf-8')]
         
