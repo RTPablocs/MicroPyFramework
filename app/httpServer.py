@@ -1,11 +1,11 @@
 from wsgiref.simple_server import make_server
-from wsgiref.util import setup_testing_defaults, request_uri
+from wsgiref.util import request_uri
 from app.router import RoutingProvider
 from extensions.utils import url_parse
 from extensions.utils import banner_generate
 
 
-class app:
+class App:
 
     def __init__(self):
         self.PORT = 8051
@@ -16,7 +16,8 @@ class app:
 
     def app_server(self, environ, start_response):
         path = url_parse(str(request_uri(environ)))
-        result = self.router.router_evaluate(path)
+        method = environ['REQUEST_METHOD']
+        result = self.router.router_evaluate(path, method)
         status = result['code']
         headers = [('Content-Type', 'application/json; charset=utf-8')]
 
