@@ -1,4 +1,4 @@
-from app.httpServer import app
+from app.httpServer import App
 
-app = app()
+app = App()
 app.run()
