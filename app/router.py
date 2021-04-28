@@ -1,11 +1,13 @@
 import urllib.parse as url
 from app.routes import routes
+from app.response import ResponseFactory
 
 
 class RoutingProvider:
 
     def __init__(self):
         self.routes = routes
+        self.response = ResponseFactory()
 
     def dynamic_evaluation(self, path, method):
         for r in self.routes:
@@ -17,8 +19,8 @@ class RoutingProvider:
                 converted_path = '/'.join(eval_path)
 
                 if converted_path == r['path'] and method == r['method']:
-                    dynamic_argument = url.urlparse(path).path.split('/')[-1]
-                    return {'path': converted_path, 'realPath': path, 'dynamic': True, 'dynamicArgument': dynamic_argument}
+                    dynamic_arg = url.urlparse(path).path.split('/')[-1]
+                    return {'path': converted_path, 'realPath': path, 'dynamic': True, 'dynamicArgument': dynamic_arg}
 
             elif r['path'] == path and method == r['method']:
                 return {'path': path, 'dynamic': False}
@@ -30,11 +32,11 @@ class RoutingProvider:
         for r in self.routes:
             if result_dict and result_dict['dynamic'] is True:
                 action_result = r['action'](result_dict['dynamicArgument'])
-                return {'code': '200 OK', 'actionResult': action_result}
+                return self.response.ok_response(action_result)
 
             elif result_dict and result_dict['dynamic'] is False:
                 action_result = r['action']()
-                return {'code': '200 OK', 'actionResult': action_result}
+                return self.response.ok_response(action_result)
 
             else:
-                return {'code': '404 ERROR', 'actionResult': 'Path Not found'}
+                return self.response.not_found_response()
