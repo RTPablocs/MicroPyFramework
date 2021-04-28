@@ -12,7 +12,7 @@ class App:
         self.HOST = 'localhost'
         self.motd = banner_generate()
         self.router = RoutingProvider()
-        self.version = 'v0.1-rc2'
+        self.version = 'v0.1-rc3'
 
     def app_server(self, environ, start_response):
         path = url_parse(str(request_uri(environ)))
