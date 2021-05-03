@@ -1,8 +1,14 @@
-from wsgiref.simple_server import make_server
+from socketserver import ThreadingMixIn
+from wsgiref.simple_server import make_server, WSGIServer
 from wsgiref.util import request_uri
+
 from app.router import RoutingProvider
-from extensions.utils import url_parse
 from extensions.utils import banner_generate
+from extensions.utils import url_parse
+
+
+class MultiThreading(ThreadingMixIn, WSGIServer):
+    daemon_threads = True
 
 
 class App:
@@ -26,6 +32,10 @@ class App:
         return [str(result).encode()]
 
     def run(self):
-        with make_server(self.HOST, self.PORT, self.app_server) as httpd:
+        with make_server(self.HOST, self.PORT, self.app_server, MultiThreading) as httpd:
             print(self.motd, '\n', 'Serving app on port:', self.PORT, '\n', self.version)
-            httpd.serve_forever()
+            try:
+                httpd.serve_forever()
+            except KeyboardInterrupt:
+                print('Shutting down, bye!')
+                httpd.server_close()
