@@ -1,6 +1,5 @@
-import urllib.parse as url
-from app.routes import routes
 from app.response import ResponseFactory
+from app.routes import routes
 
 
 class RoutingProvider:
@@ -8,35 +7,32 @@ class RoutingProvider:
     def __init__(self):
         self.routes = routes
         self.response = ResponseFactory()
+        self.json_headers = [('Content-Type', 'application/json')]
 
-    def dynamic_evaluation(self, path, method):
-        for r in self.routes:
+    def router_evaluate(self, path, method):
+        dynamic_argument = path.split('/')[-1]
+        dynamic_path = path.replace(dynamic_argument, '{var}')
 
-            if '{var}' in r['path'] and path[-1] != '/':
+        route = next((route for route in self.routes if route['path'] == path), None)
+        d_route = next((d_route for d_route in self.routes if d_route['path'] == dynamic_path), None)
 
-                eval_path = url.urlparse(path).path.split('/')
-                eval_path[-1] = '{var}'
-                converted_path = '/'.join(eval_path)
+        if d_route and d_route['method'] == method:
+            action = d_route['action'](dynamic_argument)
+            return self.response.ok_response(action)
 
-                if converted_path == r['path'] and method == r['method']:
-                    dynamic_arg = url.urlparse(path).path.split('/')[-1]
-                    return {'path': converted_path, 'realPath': path, 'dynamic': True, 'dynamicArgument': dynamic_arg}
+        elif route and route['method'] == method:
 
-            elif r['path'] == path and method == r['method']:
-                return {'path': path, 'dynamic': False}
-
-    def router_evaluate(self, route, method):
-
-        result_dict = self.dynamic_evaluation(route, method)
-
-        for r in self.routes:
-            if result_dict and result_dict['dynamic'] is True:
-                action_result = r['action'](result_dict['dynamicArgument'])
-                return self.response.ok_response(action_result)
-
-            elif result_dict and result_dict['dynamic'] is False:
-                action_result = r['action']()
-                return self.response.ok_response(action_result)
-
+            if route['action'] is not None:
+                action = route['action']()
+                return self.response.ok_response(action)
             else:
-                return self.response.not_found_response()
+                return self.response.ok_response('OK')
+
+        elif route and route['method'] != method or d_route and d_route['method'] != method:
+            if route is None:
+                return self.response.not_allowed_response(d_route['method'])
+            else:
+                return self.response.not_allowed_response(route['method'])
+
+        elif not d_route and not route:
+            return self.response.not_found_response()
