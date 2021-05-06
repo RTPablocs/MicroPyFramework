@@ -5,6 +5,7 @@ class ResponseFactory:
         self.clnt_error_code = '400 ERROR'
         self.not_found_code = '404 ERROR'
         self.forbidden_code = '403 ERROR'
+        self.not_allowed_code = '405 ERROR'
 
     def ok_response(self, action):
         response = {'code': self.ok_code, 'action': action}
@@ -24,6 +25,11 @@ class ResponseFactory:
 
     def srv_error_response(self, description):
         response = {'code': self.svr_error_code, 'description': description}
+        return response
+
+    def not_allowed_response(self, method):
+        response = {'code': self.not_allowed_code,
+                    'description': 'Method not allowed, use {method} instead'.format(method=method)}
         return response
 
 
