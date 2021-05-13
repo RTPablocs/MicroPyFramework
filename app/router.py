@@ -7,28 +7,29 @@ class RoutingProvider:
     def __init__(self):
         self.routes = routes
         self.response = ResponseFactory()
-        self.json_headers = [('Content-Type', 'application/json')]
 
-    def router_evaluate(self, path, method):
-        dynamic_argument = path.split('/')[-1]
-        dynamic_path = path.replace(dynamic_argument, '{var}')
+    def router_evaluate(self, **kwargs):
+        dynamic_argument = kwargs['path'].split('/')[-1]
+        dynamic_path = kwargs['path'].replace(dynamic_argument, '{var}')
 
-        route = next((route for route in self.routes if route['path'] == path), None)
+        body = kwargs['body']
+
+        route = next((route for route in self.routes if route['path'] == kwargs['path']), None)
         d_route = next((d_route for d_route in self.routes if d_route['path'] == dynamic_path), None)
 
-        if d_route and d_route['method'] == method:
-            action = d_route['action'](dynamic_argument)
+        if d_route and d_route['method'] == kwargs['method']:
+            action = d_route['action'](argument=dynamic_argument, body=body)
             return self.response.ok_response(action)
 
-        elif route and route['method'] == method:
+        elif route and route['method'] == kwargs['method']:
 
             if route['action'] is not None:
-                action = route['action']()
+                action = route['action'](body=body)
                 return self.response.ok_response(action)
             else:
                 return self.response.ok_response('OK')
 
-        elif route and route['method'] != method or d_route and d_route['method'] != method:
+        elif route and route['method'] != kwargs['method'] or d_route and d_route['method'] != kwargs['method']:
             if route is None:
                 return self.response.not_allowed_response(d_route['method'])
             else:
