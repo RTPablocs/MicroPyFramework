@@ -8,7 +8,7 @@ class ResponseFactory:
         self.not_allowed_code = '405 ERROR'
 
     def ok_response(self, action):
-        response = {'code': self.ok_code, 'action': action}
+        response = {'code': self.ok_code, 'result': action}
         return response
 
     def not_found_response(self):
