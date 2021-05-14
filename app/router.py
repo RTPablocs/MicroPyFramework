@@ -1,41 +1,39 @@
-import urllib.parse as url
+from app.response import ResponseFactory
 from app.routes import routes
 
-class routingService:
+
+class RoutingProvider:
 
     def __init__(self):
         self.routes = routes
-    
-    def dynamicEval(self, p):
-        for r in self.routes:
+        self.response = ResponseFactory()
 
-            if '{var}' in r['path'] and p[-1] != '/':
+    def router_evaluate(self, **kwargs):
+        dynamic_argument = kwargs['path'].split('/')[-1]
+        dynamic_path = kwargs['path'].replace(dynamic_argument, '{var}')
 
-                evalPath = url.urlparse(p).path.split('/')
-                evalPath[-1] = '{var}'
-                cPath = '/'.join(evalPath)
-                
-                if cPath == r['path']: 
-                    dynamic = url.urlparse(p).path.split('/')[-1]
-                    return {'path': cPath, 'realPath': p, 'dynamic': True, 'dynamicArgument': dynamic}
+        body = kwargs['body']
 
-            elif r['path'] == p:
-                return  {'path': p, 'dynamic': False}
-                    
+        route = next((route for route in self.routes if route['path'] == kwargs['path']), None)
+        d_route = next((d_route for d_route in self.routes if d_route['path'] == dynamic_path), None)
 
-    def routerEval(self, route):
+        if d_route and d_route['method'] == kwargs['method']:
+            action = d_route['action'](argument=dynamic_argument, body=body)
+            return self.response.ok_response(action)
 
-        rDict = self.dynamicEval(route)
-        
-        for r in self.routes:
-            if r['path'] == rDict['path'] and rDict['dynamic'] == True  : 
-                actionResult = r['action'](rDict['dynamicArgument'])
-                return {'code': '200 OK', 'actionResult': actionResult}
-            
-            elif r['path'] == rDict['path'] and rDict['dynamic'] == False:
-                actionResult = r['action']()
-                return{'code': '200 OK', 'actionResult': actionResult}
+        elif route and route['method'] == kwargs['method']:
 
-            elif rDict['path'] not in r['path'] : 
-                return {'code': '404 ERROR', 'actionResult': 'Path Not found'}
-            
+            if route['action'] is not None:
+                action = route['action'](body=body)
+                return self.response.ok_response(action)
+            else:
+                return self.response.ok_response('OK')
+
+        elif route and route['method'] != kwargs['method'] or d_route and d_route['method'] != kwargs['method']:
+            if route is None:
+                return self.response.not_allowed_response(d_route['method'])
+            else:
+                return self.response.not_allowed_response(route['method'])
+
+        elif not d_route and not route:
+            return self.response.not_found_response()
