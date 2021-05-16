@@ -24,8 +24,8 @@ class RoutingProvider:
         elif route and route['method'] == kwargs['method']:
 
             if route['action'] is not None:
-                action = route['action'](body=body)
-                return self.response.ok_response(action)
+                result = route['action'](body=body)
+                return result
             else:
                 return self.response.ok_response('OK')
 
