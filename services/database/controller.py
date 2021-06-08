@@ -1,23 +1,11 @@
-from os import environ
-from mysql.connector import connect, Error
+from sqlalchemy import create_engine
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
 
 
-class DataBaseController:
-
+class Db:
     def __init__(self):
-        self.user = environ['MYSQL_USER']
-        self.host = environ['MYSQL_HOST']
-        self.password = environ['MYSQL_PASSWD']
-        self.database = environ['MYSQL_DB']
-
-    def connector(self):
-        try:
-            with connect(host=self.host, user=self.user, password=self.password) as conn:
-                return conn
-        except Error as e:
-            return e
-
-    def insert_one(self, **kwargs):
-        conn = self.connector()
-        cursor = conn.cursor()
-        cursor.execute()
+        self.engine = create_engine('sqlite:///carapp.sqlite3?check_same_thread=False')
+        self.session_conn = sessionmaker(bind=self.engine)
+        self.session = self.session_conn()
+        self.base = declarative_base()
