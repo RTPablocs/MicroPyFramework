@@ -33,7 +33,7 @@ class App:
         body = get_request_body(environ) if environ['CONTENT_LENGTH'] else None
         result = self.router.router_evaluate(path=path, method=method, body=body)
         status = result['code']
-        headers = [('Content-Type', 'application/json; charset=utf-8')]
+        headers = [('Content-Type', 'application/json; charset=utf-8'), ('Access-Control-Allow-Origin', '*')]
 
         start_response(status, headers)
 
