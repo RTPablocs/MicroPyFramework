@@ -1,10 +1,8 @@
-from app.greet import Greet
-from app.farewell import Farewell
-from app.body import body_serve
+from services.products.repository import *
+
 routes = [
-    {'path': '/hello', 'method': 'GET', 'action': Farewell},
-    {'path': '/hello/{var}', 'method': 'POST', 'action': Greet},
-    {'path': '/', 'method': 'GET', 'action': Farewell},
-    {'path': '/favicon.ico', 'method': 'GET', 'action': None},
-    {'path': '/body', 'method': 'POST', 'action': body_serve}
+    {'path': '/', 'method': 'GET', 'action': None, 'requires_body': False},
+    {'path': '/favicon.ico', 'method': 'GET', 'action': None, 'requires_body': False},
+    {'path': '/products', 'method': 'GET', 'action': get_all_products, 'requires_body': False},
+    {'path': '/product/{var}', 'method': 'GET', 'action': get_product_by_id, 'requires_body': False}
 ]
