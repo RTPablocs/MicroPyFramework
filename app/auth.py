@@ -4,8 +4,8 @@ import jwt
 
 class Authorization:
     def __init__(self):
-        self.secret = environ['JWT_SECRET']
-        self.algorithm = environ['JWT_ALGORITHM']
+        self.secret = environ.get('JWT_SECRET')
+        self.algorithm = environ.get('JWT_ALGORITHM')
 
     def encode_token(self, data):
         token = jwt.encode(data, self.secret, algorithm=self.algorithm)
