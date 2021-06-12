@@ -17,15 +17,22 @@ class RoutingProvider:
         route = next((route for route in self.routes if route['path'] == kwargs['path']), None)
         d_route = next((d_route for d_route in self.routes if d_route['path'] == dynamic_path), None)
 
+        if kwargs['method'] == 'OPTIONS':
+            return self.response.ok_response('OK')
+
         if d_route and d_route['method'] == kwargs['method']:
-            action = d_route['action'](argument=dynamic_argument, body=body)
-            return self.response.ok_response(action)
+            action = d_route['action'](argument=dynamic_argument)
+            return action
 
         elif route and route['method'] == kwargs['method']:
 
-            if route['action'] is not None:
-                action = route['action'](body=body)
-                return self.response.ok_response(action)
+            if route['action'] is not None and route['requires_body'] is True:
+                result = route['action'](body=body)
+                return result
+
+            elif route['action'] is not None and route['requires_body'] is False:
+                result = route['action']()
+                return result
             else:
                 return self.response.ok_response('OK')
 

@@ -2,6 +2,7 @@ import json
 from socketserver import ThreadingMixIn
 from wsgiref.simple_server import make_server, WSGIServer
 from wsgiref.util import request_uri
+
 from app.router import RoutingProvider
 from extensions.utils import banner_generate
 from extensions.utils import url_parse
@@ -33,7 +34,8 @@ class App:
         body = get_request_body(environ) if environ['CONTENT_LENGTH'] else None
         result = self.router.router_evaluate(path=path, method=method, body=body)
         status = result['code']
-        headers = [('Content-Type', 'application/json; charset=utf-8')]
+        headers = [('Content-Type', 'application/json; charset=utf-8'), ('Access-Control-Allow-Origin', '*'),
+                   ('Access-Control-Allow-Headers', 'Content-Type')]
 
         start_response(status, headers)
 
