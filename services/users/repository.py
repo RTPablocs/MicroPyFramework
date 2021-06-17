@@ -1,8 +1,9 @@
+import uuid
+
 from app.auth import Authorization
 from app.response import ResponseFactory
 from services.database.controller import Db
 from services.users.model import User
-import uuid
 
 auth = Authorization()
 db = Db()
@@ -48,3 +49,11 @@ def register_user(body):
         return resp.ok_response('User OK')
     else:
         return resp.forbidden_response()
+
+
+def verify_user(**kwargs):
+    db.session.query(User).filter(User.user_uid == kwargs['argument']).update({
+        'verified': 1
+    })
+    db.session.commit()
+    return resp.ok_response('Verify user OK')
