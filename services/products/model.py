@@ -17,7 +17,7 @@ class Products(db.base):
     product_price = Column(Integer)
     product_miles = Column(Integer)
     product_views = Column(Integer)
-    product_owner = Column(String, ForeignKey('users.user_uid'))
+    product_owner = Column(String)
 
     def __init__(self, product_uid, product_title, product_desc, product_brand, product_model, product_category,
                  product_price, product_miles, product_views, product_owner):
